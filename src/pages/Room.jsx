@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect }, { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { ZegoUIKitPrebuilt } from '@zegocloud/zego-uikit-prebuilt';
 import Captions from '@/components/Captions';
@@ -14,6 +14,13 @@ const Room = () => {
     }, []);
 
     const myMeeting = async (element) => {
+    const containerRef = useRef(null);
+    const zpRef = useRef(null);
+
+    useEffect(() => {
+        const element = containerRef.current;
+        if (!element) return;
+
         // Generate Kit Token
         const appID = 328211389;
         const serverSecret = "0d303ad2cd3e94d336c226fd5a569257";
@@ -36,6 +43,7 @@ const Room = () => {
 
         // Create instance object from Kit Token.
         const zp = ZegoUIKitPrebuilt.create(kitToken);
+        zpRef.current = zp;
 
         // Start the call
         zp.joinRoom({
@@ -60,11 +68,19 @@ const Room = () => {
             showUserList: false,
             layout: "Auto",
         });
-    };
+
+        // Cleanup function
+        return () => {
+            if (zpRef.current) {
+                zpRef.current.destroy();
+            }
+        };
+    }, [roomId]);
 
     return (
         <div
             className="myCallContainer relative overflow-hidden bg-[var(--bg-primary)]"
+            ref={containerRef}
             style={{ width: '100vw', height: '100vh' }}
         >
             <div ref={myMeeting} style={{ width: '100%', height: '100%' }}></div>
