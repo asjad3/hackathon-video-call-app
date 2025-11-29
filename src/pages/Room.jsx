@@ -55,7 +55,7 @@ const Room = () => {
 
     return (
         <div
-            className="myCallContainer"
+            className="myCallContainer relative overflow-hidden bg-[var(--bg-primary)]"
             ref={myMeeting}
             style={{ width: '100vw', height: '100vh' }}
         ></div>
