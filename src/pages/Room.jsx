@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ZegoUIKitPrebuilt } from '@zegocloud/zego-uikit-prebuilt';
-
+import Captions from '@/components/Captions';
+import 'regenerator-runtime/runtime'
 const Room = () => {
     const { roomId } = useParams();
+    const [userId, setUserId] = useState(null);
+
+    useEffect(() => {
+        // Generate a unique userId for this session
+        const generatedUserId = `User${Date.now()}`;
+        setUserId(generatedUserId);
+    }, []);
 
     const myMeeting = async (element) => {
         // Generate Kit Token
@@ -17,12 +25,13 @@ const Room = () => {
             return;
         }
 
+        const currentUserId = userId || `User${Date.now()}`;
         const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
             appID,
             serverSecret,
             roomId,
-            Date.now().toString(),
-            "User" + Date.now()
+            currentUserId,
+            currentUserId
         );
 
         // Create instance object from Kit Token.
@@ -56,9 +65,13 @@ const Room = () => {
     return (
         <div
             className="myCallContainer relative overflow-hidden bg-[var(--bg-primary)]"
-            ref={myMeeting}
             style={{ width: '100vw', height: '100vh' }}
-        ></div>
+        >
+            <div ref={myMeeting} style={{ width: '100%', height: '100%' }}></div>
+            {userId && roomId && (
+                <Captions roomId={roomId} userId={userId} />
+            )}
+        </div>
     );
 };
 
